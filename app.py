@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 VERIFY_TOKEN = "MySecretToken123"
 
-# 🔐 Render Environment Variables
+# 🔐 Render Environment Variables හරහා රහස්‍ය දත්ත කියවා ගැනීම
 ACCESS_TOKEN = os.environ.get("EAAUx74tjPN8BR9TSeM2pIEjNL2U83ecruoV31RkFvzdWqPyK1k8iyJh3k6M6PbOja0mB2YAvhg7TxCYADQZApiDzmRfEiA12Gy3VvTm0Dk8OeDtd21dCkJaPeosOB5eHhmjXFzkhIRaQpqxxmELFdHBceskXE8AbZC7LgZCH0irNQyh7GrxLne8b742nb0yDSlwejE2ZAsQqZCZCBieVg40ntL1ptyfnfA825heuW8OVxnqQrGRsjYqQZBg81RmlvvJHHhbFMHkLHdL8WpbBZAVnIwZDZD")
 PHONE_NUMBER_ID = os.environ.get("1272291502625274")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -23,16 +23,14 @@ system_instruction = (
     "Do not invent specific stock numbers, ask them to provide item codes or product details so we can check."
 )
 
-# 🤖 100% Corrected Gemini API Request Function
+# 🤖 Gemini API Request Function
 def get_gemini_response(user_message):
     if not GEMINI_API_KEY:
         return "⚠️ Gemini API Key එක Render එකේ සෙට් කරලා නැහැ මචං!"
     
-    # Gemini 1.5 Flash නිවැරදිම Endpoint එක
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
     headers = {"Content-Type": "application/json"}
     
-    # 📝 නිල Documentation එකට අනුව නිවැරදිම Payload Format එක
     payload = {
         "contents": [
             {
@@ -49,19 +47,17 @@ def get_gemini_response(user_message):
         response = requests.post(url, json=payload, headers=headers)
         res_json = response.json()
         
-        # පිළිතුර සාර්ථකව ආවොත්
         if 'candidates' in res_json and len(res_json['candidates']) > 0:
             return res_json['candidates'][0]['content']['parts'][0]['text']
         else:
-            # 🔴 ගූගල් එකෙන් වෙන මොකක් හරි Error එකක් එවුවොත් ඒක කෙලින්ම බලාගන්න පෙන්වන ක්‍රමය
             return f"❌ Gemini Error: {res_json.get('error', {}).get('message', 'Unknown Error')}"
             
     except Exception as e:
         return f"❌ Python Exception: {str(e)}"
 
-# 💬 WhatsApp Text Message Sender
+# 💬 WhatsApp Text Message Sender (Graph API v20.0)
 def send_whatsapp_message(to, text):
-    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -75,9 +71,9 @@ def send_whatsapp_message(to, text):
     response = requests.post(url, json=payload, headers=headers)
     return response.json()
 
-# 📍 WhatsApp Location Card Sender
+# 📍 WhatsApp Location Card Sender (Graph API v20.0)
 def send_whatsapp_location(to, name, address, latitude=25.1224, longitude=55.2012):
-    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -96,9 +92,9 @@ def send_whatsapp_location(to, name, address, latitude=25.1224, longitude=55.201
     response = requests.post(url, json=payload, headers=headers)
     return response.json()
 
-# 🖼️ WhatsApp Image Sender
+# 🖼️ WhatsApp Image Sender (Graph API v20.0)
 def send_whatsapp_image(to, image_url, caption_text):
-    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -136,7 +132,7 @@ def receive_message():
             from_number = message["from"]
             msg_type = message["type"]
 
-            # Voice Note ආවොත්
+            # Voice Note / Audio එකක් ආවොත්
             if msg_type == "audio" or msg_type == "voice":
                 voice_reply = (
                     "🎧 *We received your voice note!* Our trade managers will check it and reply shortly."
@@ -144,25 +140,25 @@ def receive_message():
                 send_whatsapp_message(from_number, voice_reply)
                 return jsonify({"status": "success"}), 200
 
-            # Text මැසේජ් ආවොත්
+            # Text මැසේජ් එකක් ආවොත්
             elif msg_type == "text":
                 user_text = message["text"]["body"].lower().strip()
                 
-                # Location Keyword එකක් ආවොත්
+                # Location Keyword එකක් තිබුණොත් කෙලින්ම සිතියම යවයි
                 if any(word in user_text for word in ["location", "address", "पता", "लोकेशन", "സ്ഥലം", "ലൊക്കേഷൻ"]):
                     send_whatsapp_location(from_number, "Awali International Textile Trading", "Al Quoz Industrial Area, Dubai, UAE")
                     ai_reply = get_gemini_response("The customer asked for the office location. Respond politely in 1 short sentence that we sent the Google Maps location above.")
                     send_whatsapp_message(from_number, ai_reply)
                     return jsonify({"status": "success"}), 200
                 
-                # New Material Keyword එකක් ආවොත්
+                # New Stock Keyword එකක් තිබුණොත් රෙදිවල පින්තූරයක් යවයි
                 elif any(word in user_text for word in ["new", "material", "नया", "പുതിയത്"]):
                     sample_image = "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop"
                     ai_reply = get_gemini_response("The customer asked about new arrivals or materials. Give a polite 1-sentence update about our regular stock imports, and say we shared a sample image.")
                     send_whatsapp_image(from_number, sample_image, ai_reply)
                     return jsonify({"status": "success"}), 200
 
-                # වෙනත් ඕනෑම මැසේජ් එකක් කෙලින්ම Gemini එකට
+                # වෙනත් ඕනෑම සාමාන්‍ය මැසේජ් එකක් Gemini AI එකට යවයි
                 else:
                     ai_reply = get_gemini_response(user_text)
                     send_whatsapp_message(from_number, ai_reply)
