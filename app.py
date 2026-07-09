@@ -1,10 +1,6 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-
-app = Flask(__name__)import os
-import requests
-from flask import Flask, request, jsonify
 import google.generativeai as genai
 
 app = Flask(__name__)
