@@ -1,22 +1,15 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from google import genai
-from google.genai import types
 
 app = Flask(__name__)
 
 VERIFY_TOKEN = "MySecretToken123"
 
-# 🔐 Render Environment Variables වලින් ආරක්ෂිතව Keys ලබා ගැනීම
+# 🔐 Render Environment Variables වලින් Keys ලබා ගැනීම
 ACCESS_TOKEN = os.environ.get("EAAUx74tjPN8BRznZBFdCLalPQvOZA6qu80QwS0XYnnFAZB6FZAB013cXIMj4r9eCReXdPZBByUuUHvnPw4bw0gKNFfB41tUrnwVWepc6F7af3BCFScok6jHoChPkpQCZADjSbnyBeQ5EtifUq600ZCU0uoWtAzL90R00lpI8qF8H1Kttu19KocJPeItWAx2s1aozg3RoXfB7mAcmXYakGegb3uMdZCO8y7Y2ZBfeIxZCgFeA4ZCCyJIz4kSp7k5poZC8ZBnR3dtMcbblZCliXRxF1ZCJmAmrjsQ")
 PHONE_NUMBER_ID = os.environ.get("1272291502625274")
 GEMINI_API_KEY = os.environ.get("AQ.Ab8RN6I9AX2uJjfjto_jYpcfoRxA8A7jaUxh6aP_xgoTQgKgQQ")
-
-# ගූගල්හි අලුත්ම SDK එක හරහා Gemini Client එක සෙට් කිරීම
-client = None
-if GEMINI_API_KEY:
-    client = genai.Client(api_key=GEMINI_API_KEY)
 
 # 🧠 AI එකට බිස්නස් එක ගැන කියලා දෙන කොටස
 system_instruction = (
@@ -31,7 +24,30 @@ system_instruction = (
     "Do not invent specific stock numbers, ask them to provide item codes or product details so we can check."
 )
 
-# 💬 සාමාන්‍ය Text මැසේජ් යවන ක්‍රමය
+# 🤖 HTTP Requests මඟින් Gemini AI එකෙන් පිළිතුරු ලබා ගන්නා ක්‍රමය
+def get_gemini_response(user_message):
+    if not GEMINI_API_KEY:
+        return "Service temporarily unavailable."
+    
+    # Google Gemini 1.5 Flash නිල API Endpoint එක
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    headers = {"Content-Type": "application/json"}
+    
+    payload = {
+        "contents": [{"parts": [{"text": user_message}]}],
+        "systemInstruction": {"parts": [{"text": system_instruction}]}
+    }
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        res_json = response.json()
+        # AI එක එවපු පිළිතුර වෙන් කර ගැනීම
+        return res_json['candidates'][0]['content']['parts'][0]['text']
+    except Exception as e:
+        print("Gemini API Error:", e)
+        return "Thank you for contacting us. Our team will get back to you soon."
+
+# 💬 වට්ස්ඇප් Text මැසේජ් යවන ක්‍රමය
 def send_whatsapp_message(to, text):
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {
@@ -119,41 +135,27 @@ def receive_message():
                 return jsonify({"status": "success"}), 200
 
             # 💬 TEXT මැසේජ් ආවොත්
-            elif msg_type == "text" and client:
+            elif msg_type == "text":
                 user_text = message["text"]["body"].lower().strip()
                 
                 # Location එක ඇහුවොත්
                 if any(word in user_text for word in ["location", "address", "पता", "लोकेशन", "സ്ഥലം", "ലൊക്കേഷൻ"]):
                     send_whatsapp_location(from_number, "Awali International Textile Trading", "Al Quoz Industrial Area, Dubai, UAE")
-                    
-                    response = client.models.generate_content(
-                        model='gemini-1.5-flash',
-                        contents="The customer asked for the office location. Respond politely in 1 short sentence that we sent the Google Maps location above.",
-                        config=types.GenerateContentConfig(system_instruction=system_instruction)
-                    )
-                    send_whatsapp_message(from_number, response.text)
+                    ai_reply = get_gemini_response("The customer asked for the office location. Respond politely in 1 short sentence that we sent the Google Maps location above.")
+                    send_whatsapp_message(from_number, ai_reply)
                     return jsonify({"status": "success"}), 200
                 
                 # New Stock ඇහුවොත්
-                elif any(word in user_text for word in ["new", "material", "नया", "पुതിയത്"]):
+                elif any(word in user_text for word in ["new", "material", "नया", "പുതിയത്"]):
                     sample_image = "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop"
-                    
-                    response = client.models.generate_content(
-                        model='gemini-1.5-flash',
-                        contents="The customer asked about new arrivals or materials. Give a polite 1-sentence update about our regular stock imports, and say we shared a sample image.",
-                        config=types.GenerateContentConfig(system_instruction=system_instruction)
-                    )
-                    send_whatsapp_image(from_number, sample_image, response.text)
+                    ai_reply = get_gemini_response("The customer asked about new arrivals or materials. Give a polite 1-sentence update about our regular stock imports, and say we shared a sample image.")
+                    send_whatsapp_image(from_number, sample_image, ai_reply)
                     return jsonify({"status": "success"}), 200
 
-                # වෙනත් ඕනෑම ප්‍රශ්නයක් Gemini AI එකට
+                # වෙනත් ඕනෑම ප්‍රශ්නයක් කෙළින්ම Gemini HTTP API එකට
                 else:
-                    response = client.models.generate_content(
-                        model='gemini-1.5-flash',
-                        contents=user_text,
-                        config=types.GenerateContentConfig(system_instruction=system_instruction)
-                    )
-                    send_whatsapp_message(from_number, response.text)
+                    ai_reply = get_gemini_response(user_text)
+                    send_whatsapp_message(from_number, ai_reply)
             
     except Exception as e:
         print("Error processing message:", e)
