@@ -1,22 +1,24 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 app = Flask(__name__)
 
 VERIFY_TOKEN = "MySecretToken123"
 
-# 🔐 Render Dashboard එකෙන් ආරක්ෂිතව Keys කියවා ගන්නා ක්‍රමය
+# 🔐 Render Environment Variables වලින් ආරක්ෂිතව Keys ලබා ගැනීම
 ACCESS_TOKEN = os.environ.get("EAAUx74tjPN8BRznZBFdCLalPQvOZA6qu80QwS0XYnnFAZB6FZAB013cXIMj4r9eCReXdPZBByUuUHvnPw4bw0gKNFfB41tUrnwVWepc6F7af3BCFScok6jHoChPkpQCZADjSbnyBeQ5EtifUq600ZCU0uoWtAzL90R00lpI8qF8H1Kttu19KocJPeItWAx2s1aozg3RoXfB7mAcmXYakGegb3uMdZCO8y7Y2ZBfeIxZCgFeA4ZCCyJIz4kSp7k5poZC8ZBnR3dtMcbblZCliXRxF1ZCJmAmrjsQ")
 PHONE_NUMBER_ID = os.environ.get("1272291502625274")
 GEMINI_API_KEY = os.environ.get("AQ.Ab8RN6I9AX2uJjfjto_jYpcfoRxA8A7jaUxh6aP_xgoTQgKgQQ")
 
-# Google Gemini AI එක Configure කිරීම
+# ගූගල්හි අලුත්ම SDK එක හරහා Gemini Client එක සෙට් කිරීම
+client = None
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
-# 🧠 AI එකට බිස්നස් එක ගැන කියලා දෙන කොටස
+# 🧠 AI එකට බිස්නස් එක ගැන කියලා දෙන කොටස
 system_instruction = (
     "You are the expert B2B Export Trade Manager for 'Awali International Textile Trading' based in Al Quoz, Dubai, UAE. "
     "We import premium Fabric Rolls globally and export/supply to GCC countries (Saudi Arabia, Oman, Qatar, Kuwait, Bahrain, UAE) and worldwide. "
@@ -29,12 +31,7 @@ system_instruction = (
     "Do not invent specific stock numbers, ask them to provide item codes or product details so we can check."
 )
 
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
-    system_instruction=system_instruction
-)
-
-# 💬 සාමාන්‍ය Text මැසේජ් യවන ක්‍රමය
+# 💬 සාමාන්‍ය Text මැසේජ් යවන ක්‍රමය
 def send_whatsapp_message(to, text):
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {
@@ -71,7 +68,7 @@ def send_whatsapp_location(to, name, address, latitude=25.1224, longitude=55.201
     response = requests.post(url, json=payload, headers=headers)
     return response.json()
 
-# 🖼️ IMAGE (පින්තූර) එකක් විස්තර (Caption) එකක් එක්ක යවන ක්‍රමය
+# 🖼️ IMAGE (පින්තූර) එකක් විස්තර එකක් එක්ක යවන ක්‍රමය
 def send_whatsapp_image(to, image_url, caption_text):
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {
@@ -122,27 +119,41 @@ def receive_message():
                 return jsonify({"status": "success"}), 200
 
             # 💬 TEXT මැසේජ් ආවොත්
-            elif msg_type == "text":
+            elif msg_type == "text" and client:
                 user_text = message["text"]["body"].lower().strip()
                 
-                # Location එක ඇහුවොත් කෙළින්ම මැප් එක සෙන්ඩ් වෙනවා
+                # Location එක ඇහුවොත්
                 if any(word in user_text for word in ["location", "address", "पता", "लोकेशन", "സ്ഥലം", "ലൊക്കേഷൻ"]):
                     send_whatsapp_location(from_number, "Awali International Textile Trading", "Al Quoz Industrial Area, Dubai, UAE")
-                    ai_response = model.generate_content("The customer asked for the office location. Respond politely in 1 short sentence that we sent the Google Maps location above.")
-                    send_whatsapp_message(from_number, ai_response.text)
+                    
+                    response = client.models.generate_content(
+                        model='gemini-1.5-flash',
+                        contents="The customer asked for the office location. Respond politely in 1 short sentence that we sent the Google Maps location above.",
+                        config=types.GenerateContentConfig(system_instruction=system_instruction)
+                    )
+                    send_whatsapp_message(from_number, response.text)
                     return jsonify({"status": "success"}), 200
                 
-                # New Stock ඇහුවොත් පින්තූරය සෙන්ඩ් වෙනවා
-                elif any(word in user_text for word in ["new", "material", "नया", "പുതിയത്"]):
+                # New Stock ඇහුවොත්
+                elif any(word in user_text for word in ["new", "material", "नया", "पुതിയത്"]):
                     sample_image = "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop"
-                    ai_response = model.generate_content("The customer asked about new arrivals or materials. Give a polite 1-sentence update about our regular stock imports, and say we shared a sample image.")
-                    send_whatsapp_image(from_number, sample_image, ai_response.text)
+                    
+                    response = client.models.generate_content(
+                        model='gemini-1.5-flash',
+                        contents="The customer asked about new arrivals or materials. Give a polite 1-sentence update about our regular stock imports, and say we shared a sample image.",
+                        config=types.GenerateContentConfig(system_instruction=system_instruction)
+                    )
+                    send_whatsapp_image(from_number, sample_image, response.text)
                     return jsonify({"status": "success"}), 200
 
                 # වෙනත් ඕනෑම ප්‍රශ්නයක් Gemini AI එකට
                 else:
-                    ai_response = model.generate_content(user_text)
-                    send_whatsapp_message(from_number, ai_response.text)
+                    response = client.models.generate_content(
+                        model='gemini-1.5-flash',
+                        contents=user_text,
+                        config=types.GenerateContentConfig(system_instruction=system_instruction)
+                    )
+                    send_whatsapp_message(from_number, response.text)
             
     except Exception as e:
         print("Error processing message:", e)
