@@ -7,8 +7,8 @@ app = Flask(__name__)
 VERIFY_TOKEN = "MySecretToken123"
 
 # 🔐 Render Environment Variables හරහා රහස්‍ය දත්ත කියවා ගැනීම
-ACCESS_TOKEN = os.environ.get("EAAUx74tjPN8BR9TSeM2pIEjNL2U83ecruoV31RkFvzdWqPyK1k8iyJh3k6M6PbOja0mB2YAvhg7TxCYADQZApiDzmRfEiA12Gy3VvTm0Dk8OeDtd21dCkJaPeosOB5eHhmjXFzkhIRaQpqxxmELFdHBceskXE8AbZC7LgZCH0irNQyh7GrxLne8b742nb0yDSlwejE2ZAsQqZCZCBieVg40ntL1ptyfnfA825heuW8OVxnqQrGRsjYqQZBg81RmlvvJHHhbFMHkLHdL8WpbBZAVnIwZDZD")
-PHONE_NUMBER_ID = os.environ.get("1272291502625274")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 system_instruction = (
