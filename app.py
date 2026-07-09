@@ -8,7 +8,7 @@ VERIFY_TOKEN = "MySecretToken123"
 
 # ⚠️ ඔයාගේ Token එක සහ ලොග්ස් එකෙන් අහුවුණු අලුත්ම නිවැරදිම Phone Number ID එක මෙතන තියෙන්නේ
 ACCESS_TOKEN = r"EAAUx74tjPN8BRznZBFdCLalPQvOZA6qu80QwS0XYnnFAZB6FZAB013cXIMj4r9eCReXdPZBByUuUHvnPw4bw0gKNFfB41tUrnwVWepc6F7af3BCFScok6jHoChPkpQCZADjSbnyBeQ5EtifUq600ZCU0uoWtAzL90R00lpI8qF8H1Kttu19KocJPeItWAx2s1aozg3RoXfB7mAcmXYakGegb3uMdZCO8y7Y2ZBfeIxZCgFeA4ZCCyJIz4kSp7k5poZC8ZBnR3dtMcbblZCliXRxF1ZCJmAmrjsQ"
-PHONE_NUMBER_ID = "1272291502626274"
+PHONE_NUMBER_ID = "1272291502625274"
 
 # 1. 💬 සාමාන්‍ย Text මැසේජ් යවන ක්‍රමය
 def send_whatsapp_message(to, text):
