@@ -35,7 +35,7 @@ Rules for Responding:
 4. Never invent stock numbers or precise custom pricing. Ask them to provide specific item codes or industrial material specifications so we can verify manually.
 """
 
-# 📝 Exact Custom Welcome Message layout with your updated text
+# 📝 Welcome Message with Language Menu
 WELCOME_MESSAGE = (
     "👋 Welcome to Al Awali Trading Co. LLC.\n\n"
     "Thank you for contacting us.\n\n"
@@ -44,6 +44,19 @@ WELCOME_MESSAGE = (
     "🇬🇧 1. English\n"
     "🇦🇪 2. العربية (Arabic)\n"
     "🇮🇳 3. हिन्दी / اردو (Hindi / Urdu)"
+)
+
+# 📝 Main Menu displayed after selecting a language
+MAIN_MENU = (
+    "How can we assist you today?\n\n"
+    "1️⃣ Browse Fabric Collections\n"
+    "2️⃣ Request a Fabric Quotation\n"
+    "3️⃣ Wholesale / Bulk Order Inquiry\n"
+    "4️⃣ Check Product Availability\n"
+    "5️⃣ Send Fabric Sample / Reference Image\n"
+    "6️⃣ Delivery & Shipping Information\n"
+    "7️⃣ Our Location 📍\n"
+    "8️⃣ Contact Our Sales Team"
 )
 
 # =========================
@@ -125,7 +138,7 @@ def send_whatsapp_message(to, text):
     print(response.status_code)
 
 # =========================
-# LOCATION CARD (Al Awali Trading Co LLC Head Office)
+# LOCATION CARD
 # =========================
 def send_location(to):
     if not ACCESS_TOKEN or not PHONE_NUMBER_ID:
@@ -195,25 +208,44 @@ def webhook():
             user_text = message["text"]["body"].lower().strip()
             print("USER:", user_text)
 
-            # 1. Greeting Check -> Fires your brand new language selection menu layout
+            # 1. Greeting Check -> Send Welcome Language Menu
             greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam"]
-            
             if any(word == user_text for word in greeting_keywords) or user_text.startswith("assalamualaikum"):
                 send_whatsapp_message(sender, WELCOME_MESSAGE)
                 return jsonify({"status": "success"}), 200
 
-            # 2. Location Check
-            location_keywords = ["location", "address", "पता", "लोकेशन", "موقع", "عنوان"]
-            
-            if any(word in user_text for word in location_keywords):
+            # 2. Language Selection Check (If user inputs 1, 2, or 3 right after greeting)
+            if user_text in ["1", "2", "3", "1.", "2.", "3."]:
+                send_whatsapp_message(sender, MAIN_MENU)
+                return jsonify({"status": "success"}), 200
+
+            # 3. Main Menu Option 7 Check -> Send Location Card
+            if user_text in ["7", "7.", "location", "address", "पता", "موقع"]:
                 send_location(sender)
-                reply = get_gemini_response("The customer asked for the office location. Respond politely in 1 short sentence stating that we have shared our official location card above.")
+                reply = get_gemini_response("The customer selected the location option. Respond politely in 1 short sentence stating that we have shared our official location card above.")
                 send_whatsapp_message(sender, reply)
-            
-            # 3. Regular Inquiries managed directly via Gemini API
+                return jsonify({"status": "success"}), 200
+
+            # 4. Handle other menu numbers or normal text via Gemini AI
+            # Mapping menu numbers to clear context for the AI
+            menu_mapping = {
+                "1": "The customer wants to browse fabric collections.",
+                "2": "The customer is requesting a fabric quotation.",
+                "3": "The customer is inquiring about wholesale / bulk orders.",
+                "4": "The customer wants to check product availability.",
+                "5": "The customer wants to send a fabric sample or reference image.",
+                "6": "The customer is asking about delivery and shipping information.",
+                "8": "The customer wants to contact our sales team directly."
+            }
+
+            clean_num = user_text.replace(".", "")
+            if clean_num in menu_mapping:
+                ai_prompt = f"{menu_mapping[clean_num]} Provide a professional assistance response."
+                reply = get_gemini_response(ai_prompt)
             else:
                 reply = get_gemini_response(message["text"]["body"])
-                send_whatsapp_message(sender, reply)
+
+            send_whatsapp_message(sender, reply)
 
         else:
             send_whatsapp_message(
