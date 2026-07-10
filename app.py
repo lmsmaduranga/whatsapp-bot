@@ -16,9 +16,9 @@ print("ACCESS TOKEN:", "OK" if ACCESS_TOKEN else "MISSING")
 print("PHONE NUMBER ID:", PHONE_NUMBER_ID if PHONE_NUMBER_ID else "MISSING")
 print("GEMINI KEY:", "OK" if GEMINI_API_KEY else "MISSING")
 
-# 🏢 System instruction updated with 'Al Awali Trading Co LLC'
+# 🏢 System instruction restricted strictly to English, Arabic, and Hindi
 system_instruction = """
-You are the expert B2B Export Trade Manager for Al Awali Trading Co LLC based in Al Quoz, Dubai, UAE.
+You are the expert B2B Export Trade Manager for Al Awali Trading Co LLC Head Office based in Dubai, UAE.
 
 We import premium fabric rolls globally and export wholesale fabric supplies to GCC countries (Saudi Arabia, Oman, Qatar, Kuwait, Bahrain, UAE) and worldwide.
 
@@ -28,12 +28,21 @@ Products:
 - Polyester
 - Spandex
 
-Rules:
-1. Reply in customer's exact language (English, Hindi, Malayalam, Sinhala, etc.).
-2. Keep reply short, professional, and business-focused (Under 3 sentences).
-3. We sell only wholesale fabric rolls/bales. MOQ is 1 pallet or container. We do NOT sell individual items or small quantities.
-4. Never invent stock or prices. Ask them to provide specific item codes or requirements.
+Rules for Responding:
+1. Strictly respond ONLY in the customer's choice among these three languages: English, Arabic, or Hindi. Do not use any other languages.
+2. Keep replies short, professional, polite, and completely business-focused (Under 3 sentences).
+3. We sell only wholesale fabric rolls/bales. MOQ is 1 pallet or container. We do NOT sell individual items, garments, or small retail quantities.
+4. Never invent stock numbers or precise custom pricing. Ask them to provide specific item codes or industrial material specifications so we can verify manually.
 """
+
+# 📝 Exact Custom Welcome Message requested by you
+WELCOME_MESSAGE = (
+    "👋 Welcome to Al Awali Fabrics!\n\n"
+    "Thank you for contacting us.\n\n"
+    "We are delighted to assist you with our premium collection of fabrics and textiles for retail and wholesale customers. "
+    "Our team is committed to helping you find the perfect fabric for your fashion, tailoring, and business needs.\n\n"
+    "Please let us know how we can assist you today, and we'll be happy to help."
+)
 
 # =========================
 # HOME CHECK
@@ -52,7 +61,7 @@ def get_gemini_response(message):
     if not GEMINI_API_KEY:
         return "Sorry, AI service is temporarily unavailable."
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
     payload = {
         "contents": [
@@ -114,7 +123,7 @@ def send_whatsapp_message(to, text):
     print(response.status_code)
 
 # =========================
-# LOCATION CARD (Al Awali Trading Co LLC)
+# LOCATION CARD (Al Awali Trading Co LLC Head Office)
 # =========================
 def send_location(to):
     if not ACCESS_TOKEN or not PHONE_NUMBER_ID:
@@ -128,10 +137,10 @@ def send_location(to):
         "to": to,
         "type": "location",
         "location": {
-            "latitude": 25.1224,
-            "longitude": 55.2012,
-            "name": "Al Awali Trading Co LLC",
-            "address": "Al Quoz Industrial Area, Dubai, UAE"
+            "latitude": 25.2694,
+            "longitude": 55.3023,
+            "name": "Al Awali Trading Co LLC Head Office",
+            "address": "Al Sabkha, Deira, Dubai, United Arab Emirates"
         }
     }
 
@@ -173,7 +182,6 @@ def webhook():
     try:
         value = data["entry"][0]["changes"][0]["value"]
 
-        # Ignore status updates
         if "messages" not in value:
             return jsonify({"status": "ignored"}), 200
 
@@ -185,17 +193,25 @@ def webhook():
             user_text = message["text"]["body"].lower().strip()
             print("USER:", user_text)
 
-            # Multilingual keyword matching for Location/Address
-            location_keywords = ["location", "address", "पता", "लोकेशन", "സ്ഥലം", "ലൊക്കേഷൻ", "තැන", "ඇඩ්‍රස්"]
+            # 1. Greeting Check (Triggers your custom Welcome Message immediately)
+            greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam"]
+            
+            if any(word == user_text for word in greeting_keywords) or user_text.startswith("assalamualaikum"):
+                send_whatsapp_message(sender, WELCOME_MESSAGE)
+                return jsonify({"status": "success"}), 200
+
+            # 2. Location Check (Triggers the custom location map card)
+            location_keywords = ["location", "address", "पता", "लोकेशन", "موقع", "عنوان"]
             
             if any(word in user_text for word in location_keywords):
                 send_location(sender)
-                # Let Gemini AI generate a polite, contextual follow-up sentence along with the map card
                 reply = get_gemini_response("The customer asked for the office location. Respond politely in 1 short sentence stating that we have shared our official location card above.")
+                send_whatsapp_message(sender, reply)
+            
+            # 3. Regular Inquiries passed directly to Gemini AI
             else:
                 reply = get_gemini_response(message["text"]["body"])
-
-            send_whatsapp_message(sender, reply)
+                send_whatsapp_message(sender, reply)
 
         else:
             send_whatsapp_message(
