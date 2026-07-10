@@ -28,7 +28,7 @@ Rules for Responding:
 """
 
 # ==============================================================================
-# HARDCODED MULTILINGUAL MENUS
+# HARDCODED MULTILINGUAL MENUS (Fixed with A, B, C, D for Language)
 # ==============================================================================
 
 WELCOME_MESSAGE = (
@@ -36,10 +36,10 @@ WELCOME_MESSAGE = (
     "Thank you for contacting us.\n\n"
     "We are a trusted textile trading company based in the UAE, specializing in sourcing and supplying high-quality fabrics and textile products from leading manufacturers around the world.\n\n"
     "To continue, please select your preferred language:\n"
-    "🇬🇧 1. English\n"
-    "🇦🇪 2. العربية (Arabic)\n"
-    "🇮🇳 3. हिन्दी / اردو (Hindi / Urdu)\n"
-    "🇷🇺 4. Русский (Russian)"
+    "🇬🇧 A. English\n"
+    "🇦🇪 B. العربية (Arabic)\n"
+    "🇮🇳 C. हिन्दी / اردو (Hindi / Urdu)\n"
+    "🇷🇺 D. Русский (Russian)"
 )
 
 # --- 1. MAIN MENUS ---
@@ -107,50 +107,8 @@ FABRIC_MENU_EN = (
     "6️⃣ Embroidery & Designer Fabrics\n"
     "7️⃣ Suiting Fabrics\n"
     "8️⃣ Other Fabrics\n\n"
-    "↩️ Reply *0* to go Back to Main Menu\n"
+    "↩️ Reply *0* to go Back to Main Menu\n\n"
     "Please select a category number or send us a photo of the fabric you need."
-)
-
-FABRIC_MENU_AR = (
-    "🧵 *مجموعات الأقمشة لدينا*\n"
-    "يرجى تحديد نوع القماش الذي تبحث عنه:\n\n"
-    "1️⃣ أقمشة العبايات والأقمشة السوداء\n"
-    "2️⃣ أقمشة الفساتين والأزياء\n"
-    "3️⃣ أقمشة قطنية\n"
-    "4️⃣ أقمشة الكتان\n"
-    "5️⃣ أقمشة الحرير\n"
-    "6️⃣ أقمشة التطريز والتصميم\n"
-    "7️⃣ أقمشة البدلات والملابس الرسمية\n"
-    "8️⃣ أقمشة أخرى\n\n"
-    "↩️ أرسل *0* للعودة إلى القائمة الرئيسية"
-)
-
-FABRIC_MENU_HI = (
-    "🧵 *हमारा फैब्रिक कलेक्शन*\n"
-    "कृपया उस फैब्रिक का प्रकार चुनें जिसे आप ढूंढ रहे हैं:\n\n"
-    "1️⃣ अबाया और ब्लैक फैब्रिक्स\n"
-    "2️⃣ ड्रेस और फैशन फैब्रिक्स\n"
-    "3️⃣ सूती (कॉटन) फैब्रिक्स\n"
-    "4️⃣ लिनन फैब्रिक्स\n"
-    "5️⃣ सिल्क (रेशम) फैब्रिक्स\n"
-    "6️⃣ कढ़ाई और डिजाइनर फैब्रिक्स\n"
-    "7️⃣ सुटिंग फैब्रिक्स\n"
-    "8️⃣ अन्य फैब्रिक्स\n\n"
-    "↩️ मुख्य मेनू पर वापस जाने के लिए *0* भेजें"
-)
-
-FABRIC_MENU_RU = (
-    "🧵 *Наши коллекции тканей*\n"
-    "Пожалуйста, выберите тип ткани, который вы ищете:\n\n"
-    "1️⃣ Ткани для Абай и черные ткани\n"
-    "2️⃣ Ткани для платьев и модной одежды\n"
-    "3️⃣ Хлопковые ткани\n"
-    "4️⃣ Льняные ткани\n"
-    "5️⃣ Шелковые ткани\n"
-    "6️⃣ Вышивка и дизайнерские ткани\n"
-    "7️⃣ Костюмные ткани\n"
-    "8️⃣ Другие ткани\n\n"
-    "↩️ Отправьте *0*, чтобы вернуться в главное меню"
 )
 
 # --- 3. SAMPLE FABRIC DETAILS ---
@@ -161,33 +119,6 @@ SAMPLE_DETAILS_EN = (
     "📏 *Width:* 58 / 60 inches\n"
     "📦 *Minimum Order Quantity (MOQ):* 1 Pallet / Container (Wholesale Bulk)\n\n"
     "👉 To request prices or a physical sample, please reply with *8* to connect directly with our Sales Team, or send us a picture of your target fabric."
-)
-
-SAMPLE_DETAILS_AR = (
-    "ℹ️ *تفاصيل القماش (مواصفات عينة)*\n\n"
-    "🧵 *اسم القماش:* تشكيلة العوالي الفاخرة\n"
-    "🎨 *الألوان المتاحة:* أسود، كحلي، أبيض، بيج، قرمزي\n"
-    "📏 *العرض:* 58 / 60 بوصة\n"
-    "📦 *الحد الأدنى للطلب (MOQ):* 1 طبلية / حاوية (جملة فقط)\n\n"
-    "👉 لطلب الأسعار أو عينة، يرجى الرد برقم *8* للاتصال بفريق المبيعات، أو إرسال صورة القماش المطلوب."
-)
-
-SAMPLE_DETAILS_HI = (
-    "ℹ️ *फैब्रिक विवरण (सैंपल स्पेसिफिकेशन)*\n\n"
-    "🧵 *फैब्रिक का नाम:* प्रीमियम अल अवाली सिलेक्शन\n"
-    "🎨 *उपलब्ध रंग:* काला, नेवी ब्लू, सफेद, बेज, क्रिमसन\n"
-    "📏 *चौड़ाई (Width):* 58 / 60 इंच\n"
-    "📦 *न्यूनतम ऑर्डर मात्रा (MOQ):* 1 पैलेट / कंटेनर (केवल थोक)\n\n"
-    "👉 मूल्य या सैंपल के लिए, बिक्री टीम से जुड़ने के लिए *8* के साथ उत्तर दें, या अपने लक्षित फैब्रिक की एक तस्वीर भेजें."
-)
-
-SAMPLE_DETAILS_RU = (
-    "ℹ️ *Информация о ткани (Образец спецификации)*\n\n"
-    "🧵 *Название ткани:* Премиум Коллекция Al Awali\n"
-    "🎨 *Доступные цвета:* Черный, Темно-синий, Белый, Бежевый, Малиновый\n"
-    "📏 *Ширина:* 58 / 60 дюймов\n"
-    "📦 *Минимальный заказ (MOQ):* 1 паллета / контейнер (Опт)\n\n"
-    "👉 Чтобы запросить цены или образец, пожалуйста, ответьте цифрой *8*, чтобы связаться с отделом продаж, или отправьте фото ткани."
 )
 
 
@@ -271,84 +202,65 @@ def webhook():
             user_text = message["text"]["body"].strip().lower()
             clean_num = user_text.replace(".", "")
 
-            # 1. Greeting Triggers -> Send Language Choice Welcome Menu
+            # 1. Greeting Triggers -> Send Language Choice Welcome Menu (A, B, C, D)
             greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam", "привет", "здравствуйте"]
             if any(word == user_text for word in greeting_keywords) or user_text.startswith("assalamualaikum"):
                 send_whatsapp_message(sender, WELCOME_MESSAGE)
                 return jsonify({"status": "success"}), 200
 
-            # 2. Main Language Selector Routing (Options 1 to 4) OR Reset Menu (9)
-            if clean_num == "1":
+            # 2. Language Selection Routing using Letters (A, B, C, D) to avoid conflicts
+            if clean_num in ["a", "а"]:  # handles both english and russian character 'a'
                 send_whatsapp_message(sender, MAIN_MENU_EN)
                 return jsonify({"status": "success"}), 200
-            elif clean_num == "2":
+            elif clean_num == "b":
                 send_whatsapp_message(sender, MAIN_MENU_AR)
                 return jsonify({"status": "success"}), 200
-            elif clean_num == "3":
+            elif clean_num == "c":
                 send_whatsapp_message(sender, MAIN_MENU_HI)
-                return jsonify({"status": "success"}), 200
-            elif clean_num == "4":
+                return jsonify({"success": "success"}), 200
+            elif clean_num == "d":
                 send_whatsapp_message(sender, MAIN_MENU_RU)
                 return jsonify({"status": "success"}), 200
-            elif clean_num == "9":
-                send_whatsapp_message(sender, WELCOME_MESSAGE)
-                return jsonify({"status": "success"}), 200
 
-            # 3. Main Menu Navigation Checks
-            # Since we can't save permanent session states easily, we will handle contextual keyword triggers 
-            # and number flows intelligently based on language patterns.
+            # 3. Main Menu Option Selection Logic (1 to 9)
+            if clean_num == "1":
+                # User selected Option 1: Browse Fabric Collections
+                send_whatsapp_message(sender, FABRIC_MENU_EN)
+                return jsonify({"status": "success"}), 200
             
-            # --- Location Trigger (Option 7) ---
-            if user_text in ["7", "7.", "location", "address", "पता", "موقع", "عنوان", "адрес"]:
+            elif clean_num == "7" or user_text in ["location", "address", "पता", "موقع", "عنوان", "адрес"]:
+                # User selected Option 7: Location
                 send_location(sender)
                 reply = get_gemini_response("The customer requested the office location. Respond politely in 1 short sentence confirming that the location map card has been shared above.")
                 send_whatsapp_message(sender, reply)
                 return jsonify({"status": "success"}), 200
-
-            # --- Browse Fabrics Submenu routing ---
-            # If they say browse, fabric, collections, fabrics or type option text
-            if "browse" in user_text or "fabric" in user_text or "collection" in user_text or "الأقمشة" in user_text or "कपड़ा" in user_text or "ткани" in user_text:
-                send_whatsapp_message(sender, FABRIC_MENU_EN) # Default English context fallback for search terms
+                
+            elif clean_num == "9":
+                # User selected Option 9: Back to Language Menu
+                send_whatsapp_message(sender, WELCOME_MESSAGE)
                 return jsonify({"status": "success"}), 200
-
-            # --- Fabric Submenu Specific Category Options (Checking if user enters a category number 1-8 or 0 to go back) ---
-            # To handle fabric subcategories accurately, we catch inputs from users interacting within the collection state.
-            # If user types 0, reset back to main menu
-            if clean_num == "0":
+                
+            elif clean_num == "0":
+                # User selected Back inside Submenus
                 send_whatsapp_message(sender, MAIN_MENU_EN)
                 return jsonify({"status": "success"}), 200
 
-            # If user explicitly inputs fabric sub-choices right after receiving the category list, send the sample layout
-            if clean_num in ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"] or (clean_num in ["1", "2", "3", "4", "5", "6", "7", "8"] and any(word in user_text for word in ["abaya", "dress", "cotton", "linen", "silk", "embroidery", "suiting", "other"])):
-                send_whatsapp_message(sender, SAMPLE_DETAILS_EN)
+            # If user inputs inside fabric subcategories (choices 2 to 8)
+            if clean_num in ["2", "3", "4", "5", "6", "7", "8"]:
+                # Let's map option 8 to Sales team directly, others to sample spec card
+                if clean_num == "8":
+                    reply = get_gemini_response("The customer wants to contact our sales team directly.")
+                    send_whatsapp_message(sender, reply)
+                else:
+                    send_whatsapp_message(sender, SAMPLE_DETAILS_EN)
                 return jsonify({"status": "success"}), 200
 
-            # 4. Fallback Router through Gemini AI for dynamic B2B questions
-            menu_mapping = {
-                "2": "The customer is requesting a fabric quotation.",
-                "3": "The customer is inquiring about wholesale / bulk orders.",
-                "4": "The customer wants to check product availability.",
-                "5": "The customer wants to send a fabric sample or reference image.",
-                "6": "The customer is asking about delivery and shipping information.",
-                "8": "The customer wants to contact our sales team directly."
-            }
-
-            if clean_num in menu_mapping:
-                ai_prompt = f"{menu_mapping[clean_num]} Provide a brief, professional response matching their target language style."
-                reply = get_gemini_response(ai_prompt)
-            else:
-                # If they select any general sub-number, we dynamically present the premium sample mock metadata layout
-                if clean_num in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-                    send_whatsapp_message(sender, SAMPLE_DETAILS_EN)
-                    return jsonify({"status": "success"}), 200
-                else:
-                    reply = get_gemini_response(message["text"]["body"])
-
+            # 4. Global keywords and Gemini fallback
+            reply = get_gemini_response(message["text"]["body"])
             send_whatsapp_message(sender, reply)
 
         elif msg_type == "image":
-            # If a user uploads a photo of a fabric roll
-            reply = get_gemini_response("The user sent an image reference for a fabric. Respond politely in 1-2 sentences stating that our trade managers are reviewing the reference image and will verify availability shortly.")
+            reply = get_gemini_response("The user sent an image reference for a fabric. Respond politely stating that our trade managers will verify availability shortly.")
             send_whatsapp_message(sender, reply)
         else:
             send_whatsapp_message(sender, "Thank you for contacting Al Awali Trading Co LLC. Our team will assist you shortly.")
