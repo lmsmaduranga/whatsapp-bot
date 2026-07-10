@@ -46,8 +46,8 @@ WELCOME_MESSAGE = (
     "🇮🇳 3. हिन्दी / اردو (Hindi / Urdu)"
 )
 
-# 📝 Main Menu displayed after selecting a language
-MAIN_MENU = (
+# 📝 English Main Menu
+MAIN_MENU_EN = (
     "How can we assist you today?\n\n"
     "1️⃣ Browse Fabric Collections\n"
     "2️⃣ Request a Fabric Quotation\n"
@@ -57,6 +57,32 @@ MAIN_MENU = (
     "6️⃣ Delivery & Shipping Information\n"
     "7️⃣ Our Location 📍\n"
     "8️⃣ Contact Our Sales Team"
+)
+
+# 📝 Arabic Main Menu
+MAIN_MENU_AR = (
+    "كيف يمكننا مساعدتك اليوم؟\n\n"
+    "1️⃣ تصفح مجموعات الأقمشة\n"
+    "2️⃣ طلب عرض سعر للأقمشة\n"
+    "3️⃣ استفسار عن طلبات الجملة / الكميات الكبيرة\n"
+    "4️⃣ التحقق من توفر المنتج\n"
+    "5️⃣ إرسال عينة قماش / صورة مرجعية\n"
+    "6️⃣ معلومات التوصيل والشحن\n"
+    "7️⃣ موقعنا 📍\n"
+    "8️⃣ الاتصال بفريق المبيعات لدينا"
+)
+
+# 📝 Hindi Main Menu
+MAIN_MENU_HI = (
+    "आज हम आपकी क्या सहायता कर सकते हैं?\n\n"
+    "1️⃣ फैब्रिक कलेक्शन देखें\n"
+    "2️⃣ फैब्रिक कोटेशन के लिए अनुरोध करें\n"
+    "3️⃣ थोक / बल्क ऑर्डर पूछताछ\n"
+    "4️⃣ उत्पाद की उपलब्धता जांचें\n"
+    "5️⃣ फैब्रिक सैंपल / संदर्भ छवि भेजें\n"
+    "6️⃣ डिलीवरी और शिपिंग की जानकारी\n"
+    "7️⃣ हमारा स्थान 📍\n"
+    "8️⃣ हमारी बिक्री टीम से संपर्क करें"
 )
 
 # =========================
@@ -138,7 +164,7 @@ def send_whatsapp_message(to, text):
     print(response.status_code)
 
 # =========================
-# LOCATION CARD
+# LOCATION CARD (Al Awali Trading Co LLC Head Office)
 # =========================
 def send_location(to):
     if not ACCESS_TOKEN or not PHONE_NUMBER_ID:
@@ -208,26 +234,31 @@ def webhook():
             user_text = message["text"]["body"].lower().strip()
             print("USER:", user_text)
 
-            # 1. Greeting Check -> Send Welcome Language Menu
+            # 1. Greeting Check
             greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam"]
             if any(word == user_text for word in greeting_keywords) or user_text.startswith("assalamualaikum"):
                 send_whatsapp_message(sender, WELCOME_MESSAGE)
                 return jsonify({"status": "success"}), 200
 
-            # 2. Language Selection Check (If user inputs 1, 2, or 3 right after greeting)
-            if user_text in ["1", "2", "3", "1.", "2.", "3."]:
-                send_whatsapp_message(sender, MAIN_MENU)
+            # 2. Fixed Language Selection Check -> Directly routing to the respective language menus
+            if user_text in ["1", "1."]:
+                send_whatsapp_message(sender, MAIN_MENU_EN)
+                return jsonify({"status": "success"}), 200
+            elif user_text in ["2", "2."]:
+                send_whatsapp_message(sender, MAIN_MENU_AR)
+                return jsonify({"status": "success"}), 200
+            elif user_text in ["3", "3."]:
+                send_whatsapp_message(sender, MAIN_MENU_HI)
                 return jsonify({"status": "success"}), 200
 
             # 3. Main Menu Option 7 Check -> Send Location Card
-            if user_text in ["7", "7.", "location", "address", "पता", "موقع"]:
+            if user_text in ["7", "7.", "location", "address", "पता", "موقع", "عنوان"]:
                 send_location(sender)
-                reply = get_gemini_response("The customer selected the location option. Respond politely in 1 short sentence stating that we have shared our official location card above.")
+                reply = get_gemini_response("The customer requested the office location. Respond politely in 1 short sentence confirming that the location map card has been shared above.")
                 send_whatsapp_message(sender, reply)
                 return jsonify({"status": "success"}), 200
 
-            # 4. Handle other menu numbers or normal text via Gemini AI
-            # Mapping menu numbers to clear context for the AI
+            # 4. Handle menu options dynamically
             menu_mapping = {
                 "1": "The customer wants to browse fabric collections.",
                 "2": "The customer is requesting a fabric quotation.",
@@ -240,7 +271,7 @@ def webhook():
 
             clean_num = user_text.replace(".", "")
             if clean_num in menu_mapping:
-                ai_prompt = f"{menu_mapping[clean_num]} Provide a professional assistance response."
+                ai_prompt = f"{menu_mapping[clean_num]} Provide a brief, professional response matching the language style they used."
                 reply = get_gemini_response(ai_prompt)
             else:
                 reply = get_gemini_response(message["text"]["body"])
