@@ -16,7 +16,7 @@ print("ACCESS TOKEN:", "OK" if ACCESS_TOKEN else "MISSING")
 print("PHONE NUMBER ID:", PHONE_NUMBER_ID if PHONE_NUMBER_ID else "MISSING")
 print("GEMINI KEY:", "OK" if GEMINI_API_KEY else "MISSING")
 
-# 🏢 System instruction restricted strictly to English, Arabic, and Hindi
+# 🏢 System instruction updated with Russian language restriction
 system_instruction = """
 You are the expert B2B Export Trade Manager for Al Awali Trading Co LLC Head Office based in Dubai, UAE.
 
@@ -29,13 +29,13 @@ Products:
 - Spandex
 
 Rules for Responding:
-1. Strictly respond ONLY in the customer's choice among these three languages: English, Arabic, or Hindi. Do not use any other languages.
+1. Strictly respond ONLY in the customer's choice among these four languages: English, Arabic, Hindi, or Russian. Do not use any other languages.
 2. Keep replies short, professional, polite, and completely business-focused (Under 3 sentences).
 3. We sell only wholesale fabric rolls/bales. MOQ is 1 pallet or container. We do NOT sell individual items, garments, or small retail quantities.
 4. Never invent stock numbers or precise custom pricing. Ask them to provide specific item codes or industrial material specifications so we can verify manually.
 """
 
-# 📝 Welcome Message with Language Menu
+# 📝 Welcome Message with 4 Languages
 WELCOME_MESSAGE = (
     "👋 Welcome to Al Awali Trading Co. LLC.\n\n"
     "Thank you for contacting us.\n\n"
@@ -43,7 +43,8 @@ WELCOME_MESSAGE = (
     "To continue, please select your preferred language:\n"
     "🇬🇧 1. English\n"
     "🇦🇪 2. العربية (Arabic)\n"
-    "🇮🇳 3. हिन्दी / اردو (Hindi / Urdu)"
+    "🇮🇳 3. हिन्दी / اردو (Hindi / Urdu)\n"
+    "🇷🇺 4. Русский (Russian)"
 )
 
 # 📝 English Main Menu
@@ -56,7 +57,8 @@ MAIN_MENU_EN = (
     "5️⃣ Send Fabric Sample / Reference Image\n"
     "6️⃣ Delivery & Shipping Information\n"
     "7️⃣ Our Location 📍\n"
-    "8️⃣ Contact Our Sales Team"
+    "8️⃣ Contact Our Sales Team\n\n"
+    "9️⃣ Back to Language Menu"
 )
 
 # 📝 Arabic Main Menu
@@ -69,7 +71,8 @@ MAIN_MENU_AR = (
     "5️⃣ إرسال عينة قماش / صورة مرجعية\n"
     "6️⃣ معلومات التوصيل والشحن\n"
     "7️⃣ موقعنا 📍\n"
-    "8️⃣ الاتصال بفريق المبيعات لدينا"
+    "8️⃣ الاتصال بفريق المبيعات لدينا\n\n"
+    "9️⃣ العودة إلى قائمة اللغة"
 )
 
 # 📝 Hindi Main Menu
@@ -82,7 +85,22 @@ MAIN_MENU_HI = (
     "5️⃣ फैब्रिक सैंपल / संदर्भ छवि भेजें\n"
     "6️⃣ डिलीवरी और शिपिंग की जानकारी\n"
     "7️⃣ हमारा स्थान 📍\n"
-    "8️⃣ हमारी बिक्री टीम से संपर्क करें"
+    "8️⃣ हमारी बिक्री टीम से संपर्क करें\n\n"
+    "9️⃣ भाषा मेनू पर वापस जाएं"
+)
+
+# 📝 Russian Main Menu
+MAIN_MENU_RU = (
+    "Как мы можем помочь вам сегодня?\n\n"
+    "1️⃣ Посмотреть коллекции тканей\n"
+    "2️⃣ Запросить прайс-лист / коммерческое предложение\n"
+    "3️⃣ Оптовые закупки / Большие заказы\n"
+    "4️⃣ Проверить наличие товара\n"
+    "5️⃣ Отправить образец ткани / Изображение\n"
+    "6️⃣ Информация о доставке и логистике\n"
+    "7️⃣ Наше местоположение 📍\n"
+    "8️⃣ Связаться с отделом продаж\n\n"
+    "9️⃣ Вернуться к выбору языка"
 )
 
 # =========================
@@ -164,7 +182,7 @@ def send_whatsapp_message(to, text):
     print(response.status_code)
 
 # =========================
-# LOCATION CARD (Al Awali Trading Co LLC Head Office)
+# LOCATION CARD
 # =========================
 def send_location(to):
     if not ACCESS_TOKEN or not PHONE_NUMBER_ID:
@@ -235,12 +253,12 @@ def webhook():
             print("USER:", user_text)
 
             # 1. Greeting Check
-            greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam"]
+            greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam", "привет", "здравствуйте"]
             if any(word == user_text for word in greeting_keywords) or user_text.startswith("assalamualaikum"):
                 send_whatsapp_message(sender, WELCOME_MESSAGE)
                 return jsonify({"status": "success"}), 200
 
-            # 2. Fixed Language Selection Check -> Directly routing to the respective language menus
+            # 2. Language Selection routing (1, 2, 3, or 4) OR Back to Menu option (9)
             if user_text in ["1", "1."]:
                 send_whatsapp_message(sender, MAIN_MENU_EN)
                 return jsonify({"status": "success"}), 200
@@ -250,15 +268,21 @@ def webhook():
             elif user_text in ["3", "3."]:
                 send_whatsapp_message(sender, MAIN_MENU_HI)
                 return jsonify({"status": "success"}), 200
+            elif user_text in ["4", "4."]:
+                send_whatsapp_message(sender, MAIN_MENU_RU)
+                return jsonify({"status": "success"}), 200
+            elif user_text in ["9", "9."]:
+                send_whatsapp_message(sender, WELCOME_MESSAGE)
+                return jsonify({"status": "success"}), 200
 
             # 3. Main Menu Option 7 Check -> Send Location Card
-            if user_text in ["7", "7.", "location", "address", "पता", "موقع", "عنوان"]:
+            if user_text in ["7", "7.", "location", "address", "पता", "موقع", "عنوان", "адрес", "где вы"]:
                 send_location(sender)
                 reply = get_gemini_response("The customer requested the office location. Respond politely in 1 short sentence confirming that the location map card has been shared above.")
                 send_whatsapp_message(sender, reply)
                 return jsonify({"status": "success"}), 200
 
-            # 4. Handle menu options dynamically
+            # 4. Handle other menu numbers or regular text via Gemini AI
             menu_mapping = {
                 "1": "The customer wants to browse fabric collections.",
                 "2": "The customer is requesting a fabric quotation.",
