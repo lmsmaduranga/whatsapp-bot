@@ -35,13 +35,15 @@ Rules for Responding:
 4. Never invent stock numbers or precise custom pricing. Ask them to provide specific item codes or industrial material specifications so we can verify manually.
 """
 
-# 📝 Exact Custom Welcome Message requested by you
+# 📝 Exact Custom Welcome Message layout with your updated text
 WELCOME_MESSAGE = (
-    "👋 Welcome to Al Awali Fabrics!\n\n"
+    "👋 Welcome to Al Awali Trading Co. LLC.\n\n"
     "Thank you for contacting us.\n\n"
-    "We are delighted to assist you with our premium collection of fabrics and textiles for retail and wholesale customers. "
-    "Our team is committed to helping you find the perfect fabric for your fashion, tailoring, and business needs.\n\n"
-    "Please let us know how we can assist you today, and we'll be happy to help."
+    "We are a trusted textile trading company based in the UAE, specializing in sourcing and supplying high-quality fabrics and textile products from leading manufacturers around the world.\n\n"
+    "To continue, please select your preferred language:\n"
+    "🇬🇧 1. English\n"
+    "🇦🇪 2. العربية (Arabic)\n"
+    "🇮🇳 3. हिन्दी / اردو (Hindi / Urdu)"
 )
 
 # =========================
@@ -193,14 +195,14 @@ def webhook():
             user_text = message["text"]["body"].lower().strip()
             print("USER:", user_text)
 
-            # 1. Greeting Check (Triggers your custom Welcome Message immediately)
+            # 1. Greeting Check -> Fires your brand new language selection menu layout
             greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", "assalam"]
             
             if any(word == user_text for word in greeting_keywords) or user_text.startswith("assalamualaikum"):
                 send_whatsapp_message(sender, WELCOME_MESSAGE)
                 return jsonify({"status": "success"}), 200
 
-            # 2. Location Check (Triggers the custom location map card)
+            # 2. Location Check
             location_keywords = ["location", "address", "पता", "लोकेशन", "موقع", "عنوان"]
             
             if any(word in user_text for word in location_keywords):
@@ -208,7 +210,7 @@ def webhook():
                 reply = get_gemini_response("The customer asked for the office location. Respond politely in 1 short sentence stating that we have shared our official location card above.")
                 send_whatsapp_message(sender, reply)
             
-            # 3. Regular Inquiries passed directly to Gemini AI
+            # 3. Regular Inquiries managed directly via Gemini API
             else:
                 reply = get_gemini_response(message["text"]["body"])
                 send_whatsapp_message(sender, reply)
