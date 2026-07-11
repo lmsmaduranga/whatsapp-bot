@@ -23,29 +23,18 @@ print("GEMINI KEY:", "OK" if GEMINI_API_KEY else "MISSING")
 
 system_instruction = """
 You are the expert B2B Export Trade Manager for Al Awali Trading Co LLC Head Office based in Dubai, UAE.
-We import premium fabric rolls globally and export wholesale fabric supplies to GCC countries and worldwide.
 
-CRITICAL RULES:
-1. Always respond in the SAME LANGUAGE as the customer's question (English, Arabic, Hindi, or Russian)
-2. Keep replies short, professional, and business-focused (2-4 sentences maximum)
-3. We ONLY sell wholesale fabric rolls/bales. MOQ is 1 pallet or container
-4. We do NOT sell small retail quantities
-5. Always include our contact: +971 4 123 4567 or sales@alawalitrading.com
-6. Be helpful and polite
-7. If you don't know something, direct them to our sales team
+IMPORTANT RULES:
+1. Always respond in the SAME LANGUAGE as the customer
+2. Keep replies short (2-3 sentences maximum)
+3. We ONLY sell wholesale fabric. MOQ is 1 pallet or container
+4. Always include our contact: +971 4 123 4567
+5. Be professional and helpful
 
 COMPANY INFO:
 - Name: Al Awali Trading Co LLC
 - Location: Al Sabkha, Deira, Dubai, UAE
 - Business: Premium fabric wholesale trading
-- Products: Abaya fabrics, fashion fabrics, cotton, linen, silk, embroidered fabrics
-- Services: Global shipping, bulk orders, custom sourcing
-
-RESPONSE STYLE:
-- Professional but friendly
-- Focus on B2B wholesale
-- Short and to the point
-- Always offer to help with more details
 """
 
 # ==============================================================================
@@ -135,26 +124,103 @@ FABRIC_MENU_EN = (
 )
 
 # ==============================================================================
-# FABRIC DETAILS (Pre-defined responses for menu options)
+# FABRIC DETAILS
 # ==============================================================================
 
 FABRIC_RESPONSES = {
-    "1": "🧵 *Abaya & Black Fabrics*\n\nPremium abaya fabrics including crepe, nidha, and jersey.\nAvailable in black, navy, and dark shades.\nMOQ: 1 pallet.\n\nContact sales for catalog: +971 4 123 4567",
-    
-    "2": "👗 *Dress & Fashion Fabrics*\n\nChiffon, georgette, viscose, and printed fabrics.\nLatest designs and colors available.\nMOQ: 1 pallet.\n\nContact sales for collection: +971 4 123 4567",
-    
-    "3": "🌿 *Cotton Fabrics*\n\n100% cotton in poplin, oxford, twill, and denim.\nIdeal for shirts, dresses, and home textiles.\nMOQ: 1 pallet.\n\nContact sales for samples: +971 4 123 4567",
-    
-    "4": "🧵 *Linen Fabrics*\n\nPure linen and linen blends.\nBreathable, durable, and elegant.\nAvailable in natural and dyed colors.\nMOQ: 1 pallet.",
-    
-    "5": "✨ *Silk Fabrics*\n\nLuxury pure silk, silk blends, and satin.\nPerfect for high-end fashion and bridal wear.\nMOQ: 1 pallet.\n\nContact sales for pricing: +971 4 123 4567",
-    
-    "6": "🎨 *Embroidery & Designer Fabrics*\n\nExclusive embroidered and designer fabrics.\nHandwork, machine embroidery, and digital prints.\nCustom designs available.\nMOQ: 1 pallet.",
-    
-    "7": "👔 *Suiting Fabrics*\n\nPremium suiting for men and women.\nWool blends, polyester blends, and stretch fabrics.\nSolid, checks, and stripes available.\nMOQ: 1 pallet.",
-    
-    "8": "📦 *Other Fabrics*\n\nSpecialized technical textiles and industrial fabrics.\nCustom orders available.\nContact our team for specific requirements.\n+971 4 123 4567"
+    "1": "🧵 *Abaya & Black Fabrics*\n\nPremium abaya fabrics including crepe, nidha, and jersey.\nAvailable in black, navy, and dark shades.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "2": "👗 *Dress & Fashion Fabrics*\n\nChiffon, georgette, viscose, and printed fabrics.\nLatest designs and colors available.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "3": "🌿 *Cotton Fabrics*\n\n100% cotton in poplin, oxford, twill, and denim.\nIdeal for shirts, dresses, and home textiles.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "4": "🧵 *Linen Fabrics*\n\nPure linen and linen blends.\nBreathable, durable, and elegant.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "5": "✨ *Silk Fabrics*\n\nLuxury pure silk, silk blends, and satin.\nPerfect for high-end fashion.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "6": "🎨 *Embroidery & Designer Fabrics*\n\nExclusive embroidered and designer fabrics.\nCustom designs available.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "7": "👔 *Suiting Fabrics*\n\nPremium suiting for men and women.\nWool blends and stretch fabrics.\nMOQ: 1 pallet.\n\nContact sales: +971 4 123 4567",
+    "8": "📦 *Other Fabrics*\n\nSpecialized technical textiles and custom orders.\nContact our team: +971 4 123 4567"
 }
+
+# ==============================================================================
+# KEYWORD-BASED RESPONSES (BEFORE GEMINI)
+# ==============================================================================
+
+def get_keyword_response(user_text):
+    """Check for specific keywords and return pre-defined responses"""
+    
+    text = user_text.lower().strip()
+    
+    # --- LOCATION related ---
+    location_keywords = ["location", "address", "where", "office", "come", "visit", 
+                         "map", "direction", "موقع", "عنوان", "पता", "адрес",
+                         "කොහෙද", "ලිපිනය", "කාර්යාලය"]
+    
+    if any(keyword in text for keyword in location_keywords):
+        return "📍 *Al Awali Trading Co LLC Head Office*\n\nAl Sabkha, Deira, Dubai\nUnited Arab Emirates\n\n🕐 Business Hours:\nSunday-Thursday: 9AM-6PM (GMT+4)\nFriday: Closed\nSaturday: 10AM-2PM\n\n📞 +971 4 123 4567\n📧 sales@alawalitrading.com\n\nA location map card has been shared above. 👆"
+    
+    # --- PRICE / COST related ---
+    price_keywords = ["price", "cost", "rate", "quotation", "quote", "how much", 
+                      "pricing", "expensive", "cheap", "budget", "මිල", "වටිනාකම"]
+    
+    if any(keyword in text for keyword in price_keywords):
+        return "💰 *Pricing Information*\n\nOur fabric prices vary based on:\n• Fabric type and quality\n• Order quantity (MOQ: 1 pallet)\n• Shipping destination\n• Payment terms\n\nFor a custom quote, please send us:\n1. Fabric type/name\n2. Required quantity\n3. Quality preference\n\n📞 Request a quote: +971 4 123 4567\n📧 sales@alawalitrading.com"
+    
+    # --- AVAILABILITY related ---
+    availability_keywords = ["available", "stock", "inventory", "have", "got", "exist",
+                             "in stock", "out of stock", "තිබෙනවා", "ඇත්තේ"]
+    
+    if any(keyword in text for keyword in availability_keywords):
+        return "✅ *Stock Availability*\n\nWe maintain extensive fabric inventory including:\n• Abaya Fabrics - ✓ In Stock\n• Cotton Fabrics - ✓ In Stock\n• Linen Fabrics - ✓ In Stock\n• Silk Fabrics - ⚠️ Limited\n• Designer Fabrics - 🏭 Made to Order\n\nTo check specific items, please send:\n• Fabric code or description\n• Required quantity\n\n📞 Confirm availability: +971 4 123 4567"
+    
+    # --- CONTACT / SALES related ---
+    contact_keywords = ["contact", "sales", "call", "phone", "email", "reach", "talk",
+                        "speak", "human", "agent", "customer service", "support",
+                        "අමතන්න", "ෆෝන්", "ඉමේල්"]
+    
+    if any(keyword in text for keyword in contact_keywords):
+        return "📞 *Contact Al Awali Trading Co LLC*\n\n📍 Head Office:\nAl Sabkha, Deira, Dubai, UAE\n\n📱 Phone: +971 4 123 4567\n📧 Email: sales@alawalitrading.com\n🌐 Website: www.alawalitrading.com\n\n📱 WhatsApp: +971 54 218 0677\n\n🕐 Business Hours:\nSun-Thu: 9AM-6PM (GMT+4)\nFri: Closed\nSat: 10AM-2PM\n\nWe respond within 24 hours!"
+    
+    # --- WHOLESALE / BULK related ---
+    wholesale_keywords = ["wholesale", "bulk", "container", "pallet", "large order",
+                          "b2b", "supplier", "quantity", "MOQ", "minimum order",
+                          "තොග", "කන්ටේනර්"]
+    
+    if any(keyword in text for keyword in wholesale_keywords):
+        return "📦 *Wholesale & Bulk Orders*\n\nAl Awali Trading Co LLC - B2B Fabric Supplier\n\n✅ Benefits:\n• Competitive bulk pricing\n• MOQ: 1 Pallet (500-1000 meters)\n• Container shipping available\n• Flexible payment terms\n• Custom packaging\n• Quality guaranteed\n\n🚢 Shipping worldwide\n\n📞 Wholesale team: +971 4 123 4567\n📧 bulk@alawalitrading.com"
+    
+    # --- SHIPPING / DELIVERY related ---
+    delivery_keywords = ["delivery", "shipping", "ship", "transport", "logistics",
+                         "cargo", "freight", "courier", "deliver", "shipment",
+                         "ගෙන්වීම", "ප්‍රවාහනය"]
+    
+    if any(keyword in text for keyword in delivery_keywords):
+        return "🚚 *Shipping & Delivery*\n\nGlobal shipping available:\n\n📦 Sea Freight: 2-4 weeks\n✈️ Air Freight: 3-7 days\n🚛 Land Transport: 5-7 days (GCC)\n\n📋 Documents provided:\n• Commercial Invoice\n• Packing List\n• Certificate of Origin\n• Bill of Lading/AWB\n• Quality Certificate\n\nShipping costs vary by destination and volume.\n\n📞 Get shipping quote: +971 4 123 4567"
+    
+    # --- SAMPLES related ---
+    sample_keywords = ["sample", "photo", "picture", "image", "reference", "design",
+                       "pattern", "color", "swatch", "example", "ඡායාරූපය", "නියැදිය"]
+    
+    if any(keyword in text for keyword in sample_keywords):
+        return "📸 *Fabric Samples*\n\nHow to request samples:\n\n1️⃣ Send us a photo of your desired fabric\n2️⃣ Describe the fabric type and quality\n3️⃣ Tell us your requirements\n\n✅ Physical samples available for serious inquiries\n• Free for registered businesses\n• Shipping charges may apply\n\n📧 Send requests to: samples@alawalitrading.com\n📱 WhatsApp: +971 54 218 0677\n\nWe'll respond within 2 hours!"
+    
+    # --- COMPANY / ABOUT related ---
+    company_keywords = ["about", "company", "alawali", "who", "profile", "history",
+                        "established", "since", "mission", "vision", "හැඳින්වීම"]
+    
+    if any(keyword in text for keyword in company_keywords):
+        return "🏢 *About Al Awali Trading Co LLC*\n\nEstablished in Dubai, UAE, we are a premier B2B textile trading company.\n\n🌍 Our Mission:\nConnecting global textile manufacturers with businesses worldwide.\n\n✅ Our Services:\n• Import premium fabric rolls globally\n• Export wholesale fabric supplies\n• Supply to GCC and worldwide\n• Custom sourcing\n\n🏭 Partner with leading manufacturers from Europe, Asia, and the Middle East.\n\n💎 Specializing in:\nAbaya Fabrics | Fashion Fabrics | Cotton | Linen | Silk | Designer Fabrics\n\n📞 Learn more: +971 4 123 4567"
+    
+    # --- GREETINGS (extra) ---
+    greeting_keywords = ["thank", "thanks", "good morning", "good afternoon", "good evening"]
+    
+    if any(keyword in text for keyword in greeting_keywords):
+        return "🙏 Thank you for contacting Al Awali Trading Co LLC.\n\nWe're happy to assist you with your fabric requirements.\n\nHow can we help you today?\n\n📞 +971 4 123 4567\n📧 sales@alawalitrading.com"
+    
+    # --- HELP / SUPPORT ---
+    help_keywords = ["help", "support", "assist", "guide", "suggest", "recommend"]
+    
+    if any(keyword in text for keyword in help_keywords):
+        return "💡 *How can we help you?*\n\nAt Al Awali Trading Co LLC, we specialize in wholesale fabric supply.\n\nWe can assist with:\n• Fabric sourcing and selection\n• Wholesale pricing and quotations\n• Bulk orders and shipping\n• Quality verification\n• Custom orders\n\n📞 Call us: +971 4 123 4567\n📧 Email: sales@alawalitrading.com\n\nOr type your specific question!"
+    
+    # No keyword match
+    return None
 
 # ==============================================================================
 # CORE FUNCTIONS
@@ -172,6 +238,7 @@ def get_gemini_response(message):
     }
     
     try:
+        print(f"Sending to Gemini: {message}")
         response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=30)
         data = response.json()
         print("Gemini Response:", data)  # Debug log
@@ -183,7 +250,7 @@ def get_gemini_response(message):
             
     except requests.exceptions.Timeout:
         print("Gemini API Timeout")
-        return "We're experiencing high volume. Please contact our sales team directly at +971 4 123 4567 for immediate assistance."
+        return "We're experiencing high volume. Please contact our sales team directly at +971 4 123 4567"
     except Exception as e:
         print("Gemini Error:", str(e))
         return "Thank you for your question. Our team will respond shortly. Contact: +971 4 123 4567"
@@ -255,7 +322,7 @@ def home():
     return jsonify({
         "status": "running", 
         "service": "Al Awali WhatsApp Bot",
-        "version": "3.0.0",
+        "version": "3.1.0",
         "gemini": "enabled" if GEMINI_API_KEY else "disabled"
     }), 200
 
@@ -292,9 +359,9 @@ def webhook():
 
             print(f"User: {sender}, Text: '{user_text}', Menu: {current_menu}")
 
-            # --- STEP 1: Check for Greetings ---
+            # --- STEP 1: GREETINGS ---
             greeting_keywords = ["hi", "hello", "hey", "salam", "assalamualaikum", 
-                               "assalam", "привет", "здравствуйте", "مرحبا", "السلام عليكم", 
+                               "assalam", "привет", "здравствуйте", "مرحبا", 
                                "नमस्ते", "හලෝ", "ආයුබෝවන්"]
             
             if any(greeting in clean_text for greeting in greeting_keywords):
@@ -302,8 +369,8 @@ def webhook():
                 set_user_state(sender, {"menu": "welcome"})
                 return jsonify({"status": "success"}), 200
 
-            # --- STEP 2: Check for Language Selection (A, B, C, D) ---
-            if clean_num in ["a", "а"]:  # English (also handles Russian 'а')
+            # --- STEP 2: LANGUAGE SELECTION (A, B, C, D) ---
+            if clean_num in ["a", "а"]:
                 send_whatsapp_message(sender, MAIN_MENU_EN)
                 set_user_state(sender, {"menu": "main", "language": "en"})
                 return jsonify({"status": "success"}), 200
@@ -320,112 +387,95 @@ def webhook():
                 set_user_state(sender, {"menu": "main", "language": "ru"})
                 return jsonify({"status": "success"}), 200
 
-            # --- STEP 3: Check if User is in MAIN MENU ---
+            # --- STEP 3: MAIN MENU (1-9) ---
             if current_menu == "main":
-                # Main Menu Options (1-9)
-                if clean_num == "1":  # Fabric Collections
+                if clean_num == "1":
                     send_whatsapp_message(sender, FABRIC_MENU_EN)
-                    set_user_state(sender, {"menu": "fabric_categories", "language": "en"})
+                    set_user_state(sender, {"menu": "fabric_categories"})
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "2":  # Quotation
-                    send_whatsapp_message(sender, "📋 *Fabric Quotation Request*\n\nTo provide an accurate quote, please specify:\n• Fabric type\n• Quantity (min. 1 pallet)\n• Quality requirements\n• Delivery location\n\nOur team will respond within 24 hours.\n📞 +971 4 123 4567")
+                elif clean_num == "2":
+                    send_whatsapp_message(sender, "📋 *Quotation Request*\n\nPlease provide:\n• Fabric type\n• Quantity (min. 1 pallet)\n• Quality requirements\n• Delivery location\n\n📞 +971 4 123 4567")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "3":  # Wholesale
-                    send_whatsapp_message(sender, "📦 *Wholesale/Bulk Orders*\n\nMOQ: 1 Pallet (500-1000 meters)\nBenefits:\n✓ Competitive pricing\n✓ Flexible payment terms\n✓ Global shipping\n✓ Custom packaging\n\nContact wholesale team: +971 4 123 4567")
+                elif clean_num == "3":
+                    send_whatsapp_message(sender, "📦 *Wholesale Orders*\n\nMOQ: 1 Pallet\n✓ Competitive pricing\n✓ Global shipping\n✓ Custom packaging\n\n📞 +971 4 123 4567")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "4":  # Availability
-                    send_whatsapp_message(sender, "✅ *Product Availability Check*\n\nTo check availability, please send us:\n• Fabric code or description\n• Required quantity\n• Preferred color/variety\n\nOur team will confirm within 2 hours.\n📞 +971 4 123 4567")
+                elif clean_num == "4":
+                    send_whatsapp_message(sender, "✅ *Availability Check*\n\nSend us:\n• Fabric code/description\n• Required quantity\n\n📞 +971 4 123 4567")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "5":  # Sample
-                    send_whatsapp_message(sender, "📸 *Fabric Sample Request*\n\nPlease send us a photo of the fabric you need, or describe it in detail.\n\nWe'll identify the fabric and provide specifications.\n📞 +971 4 123 4567")
+                elif clean_num == "5":
+                    send_whatsapp_message(sender, "📸 *Send Sample Photo*\n\nShare a photo of the fabric you need.\nOur team will identify it.\n\n📞 +971 4 123 4567")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "6":  # Delivery
-                    send_whatsapp_message(sender, "🚚 *Delivery & Shipping*\n\nWorldwide shipping available:\n• Sea Freight: 2-4 weeks\n• Air Freight: 3-7 days\n• Land Transport: GCC 5-7 days\n\nContact for shipping quote: +971 4 123 4567")
+                elif clean_num == "6":
+                    send_whatsapp_message(sender, "🚚 *Shipping*\n\nSea: 2-4 weeks\nAir: 3-7 days\nLand (GCC): 5-7 days\n\n📞 +971 4 123 4567")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "7":  # Location
-                    if send_location(sender):
-                        send_whatsapp_message(sender, "📍 Location shared above!\n\nAl Awali Trading Co LLC\nAl Sabkha, Deira, Dubai\nUnited Arab Emirates\n\nVisiting hours: Sun-Thu 9AM-6PM")
-                    else:
-                        send_whatsapp_message(sender, "📍 Al Awali Trading Co LLC\nAl Sabkha, Deira, Dubai\nUnited Arab Emirates")
+                elif clean_num == "7":
+                    # Send location card AND text
+                    send_location(sender)
+                    send_whatsapp_message(sender, "📍 *Our Location*\n\nAl Awali Trading Co LLC\nAl Sabkha, Deira, Dubai\nUnited Arab Emirates\n\n🕐 Sun-Thu: 9AM-6PM\nFri: Closed\nSat: 10AM-2PM\n\n📞 +971 4 123 4567")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "8":  # Sales Team
-                    send_whatsapp_message(sender, "📞 *Contact Our Sales Team*\n\n📱 WhatsApp: +971 54 218 0677\n📞 Phone: +971 4 123 4567\n📧 Email: sales@alawalitrading.com\n🌐 Website: www.alawalitrading.com\n\nWe respond within 24 hours!")
+                elif clean_num == "8":
+                    send_whatsapp_message(sender, "📞 *Sales Team*\n\n📱 WhatsApp: +971 54 218 0677\n📞 Phone: +971 4 123 4567\n📧 Email: sales@alawalitrading.com\n🌐 Website: www.alawalitrading.com")
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "9":  # Back to Language
+                elif clean_num == "9":
                     send_whatsapp_message(sender, WELCOME_MESSAGE)
                     set_user_state(sender, {"menu": "welcome"})
                     return jsonify({"status": "success"}), 200
 
-            # --- STEP 4: Check if User is in FABRIC CATEGORIES MENU ---
+            # --- STEP 4: FABRIC CATEGORIES (1-8) ---
             elif current_menu == "fabric_categories":
                 if clean_num in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-                    # Send pre-defined fabric response
-                    response = FABRIC_RESPONSES.get(clean_num, "Fabric details available. Contact sales: +971 4 123 4567")
+                    response = FABRIC_RESPONSES.get(clean_num, "Contact sales: +971 4 123 4567")
                     send_whatsapp_message(sender, response)
-                    # Stay in fabric menu so user can select more
                     return jsonify({"status": "success"}), 200
-                
-                elif clean_num == "0":  # Back to Main Menu
+                elif clean_num == "0":
                     send_whatsapp_message(sender, MAIN_MENU_EN)
-                    set_user_state(sender, {"menu": "main", "language": "en"})
+                    set_user_state(sender, {"menu": "main"})
                     return jsonify({"status": "success"}), 200
 
             # ================================================================
-            # STEP 5: EVERYTHING ELSE → USE GEMINI AI
+            # STEP 5: KEYWORD CHECK (BEFORE GEMINI)
             # ================================================================
-            # This is where ALL other questions go to Gemini
-            print(f"Sending to Gemini: {user_text}")
+            keyword_response = get_keyword_response(user_text)
+            if keyword_response:
+                print(f"Keyword matched! Response: {keyword_response[:100]}...")
+                
+                # If location, also send location card
+                if any(word in user_text.lower() for word in ["location", "address", "office", "visit"]):
+                    send_location(sender)
+                
+                send_whatsapp_message(sender, keyword_response)
+                set_user_state(sender, {"menu": "main"})
+                return jsonify({"status": "success"}), 200
+
+            # ================================================================
+            # STEP 6: EVERYTHING ELSE → GEMINI AI
+            # ================================================================
+            print(f"No keyword match. Sending to Gemini: {user_text}")
             gemini_response = get_gemini_response(user_text)
-            send_whatsapp_message(sender, gemini_response)
             
-            # Reset to main menu after Gemini response
-            set_user_state(sender, {"menu": "main", "language": "en"})
-
-        # ================================================================
-        # IMAGE MESSAGE HANDLING
-        # ================================================================
-        elif msg_type == "image":
-            image_response = """📸 Thank you for sharing the fabric image!
-
-Our trade managers will:
-1. Identify the fabric type and quality
-2. Check availability in our inventory
-3. Provide specifications and pricing
-
-Please share additional details:
-• Required quantity (min. 1 pallet)
-• Preferred color/variety
-• Budget range
-
-We'll respond within 2 hours.
-📞 +971 4 123 4567"""
-            send_whatsapp_message(sender, image_response)
+            # If Gemini response is generic, add contact info
+            if len(gemini_response) < 50 or "team will assist" in gemini_response:
+                gemini_response = gemini_response + "\n\n📞 For immediate assistance: +971 4 123 4567"
+            
+            send_whatsapp_message(sender, gemini_response)
             set_user_state(sender, {"menu": "main"})
 
         # ================================================================
-        # OTHER MESSAGE TYPES
+        # IMAGE MESSAGE
         # ================================================================
-        elif msg_type in ["audio", "document", "video"]:
-            send_whatsapp_message(sender, "Thank you for your message. For fabric inquiries, please send a text description or photo. Our team will assist you. 📞 +971 4 123 4567")
+        elif msg_type == "image":
+            send_whatsapp_message(sender, "📸 *Fabric Image Received*\n\nOur trade managers will review your fabric image and provide details shortly.\n\nPlease share:\n• Required quantity\n• Preferred color/variety\n\n📞 +971 4 123 4567")
             set_user_state(sender, {"menu": "main"})
 
         else:
-            send_whatsapp_message(sender, "Thank you for contacting Al Awali Trading Co LLC. Please send a text message or photo of the fabric you're interested in. 📞 +971 4 123 4567")
+            send_whatsapp_message(sender, "Thank you for contacting Al Awali Trading Co LLC. 📞 +971 4 123 4567")
             set_user_state(sender, {"menu": "main"})
 
     except Exception as e:
         print("WEBHOOK ERROR:", str(e))
         try:
             if sender:
-                send_whatsapp_message(sender, "We encountered an error. Please try again or contact our sales team: +971 4 123 4567")
+                send_whatsapp_message(sender, "We encountered an error. Please try again or call +971 4 123 4567")
         except:
             pass
 
