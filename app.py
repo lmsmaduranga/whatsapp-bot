@@ -186,8 +186,6 @@ FABRIC_MENU_RU = (
 # PRE-DEFINED ANSWERS FOR ALL OPTIONS (All Languages)
 # ==============================================================================
 
-# --- ANSWER 1: Fabric Collections --- (Handled separately with FABRIC_MENU)
-
 # --- ANSWER 2: Quotation ---
 ANSWER_QUOTATION_EN = """📋 *Fabric Quotation Request*
 
@@ -1157,6 +1155,8 @@ def verify():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    sender = None # <--- THIS PREVENTS APP CRASHES
+    lang = "en"   # <--- DEFAULT LANGUAGE FALLBACK FOR ERRORS
     try:
         data = request.get_json()
         print("📨 Webhook received")
